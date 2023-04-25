@@ -41,7 +41,7 @@ if filePath or flagType:
         content = f.read()
         for word in content.replace("\n", " ").split(" "):
             checkForFlag(word)
-else:
+elif "-h" in sys.argv or "--help" in sys.argv:
     print("Flagcrack is used to find flags in files")
     print("Flagcrack will check if each line includes the flag")
     print("Flagcrack tries multiple different encodings and reverse strings")
