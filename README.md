@@ -1,15 +1,15 @@
 # Flagcrack
 
 ### What is it?
-Flagcrack is used to find flags in files
-Flagcrack will check if each line includes the flag
-Flagcrack tries multiple different encodings and reverse strings
+Flagcrack is used to find flags in files </br>
+Flagcrack will check if each line includes the flag </br>
+Flagcrack tries multiple different encodings and reverse strings </br>
 
 ### How to use it?
--p: path to file with the flag you want to grab
--f: the prefix of the flag you want to grab e.g. picoCTF
-
-Example: flagcrack -p /file.txt -f picoCTF
+-p: path to file with the flag you want to grab </br>
+-f: the prefix of the flag you want to grab e.g. picoCTF </br>
+</br>
+Example: flagcrack -p /file.txt -f picoCTF </br>
 
 ### Install
 ```bash
