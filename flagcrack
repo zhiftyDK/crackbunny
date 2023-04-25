@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+import sys
+import base64
+
+def getArg(argDefiner):
+    for index, arg in enumerate(sys.argv):
+        if argDefiner == arg:
+            return sys.argv[index + 1]
+
+filePath = getArg("-p")
+flagType = getArg("-f")
+
+banner = """
+███████ ██       █████   ██████   ██████ ██████   █████   ██████ ██   ██ 
+██      ██      ██   ██ ██       ██      ██   ██ ██   ██ ██      ██  ██  
+█████   ██      ███████ ██   ███ ██      ██████  ███████ ██      █████   
+██      ██      ██   ██ ██    ██ ██      ██   ██ ██   ██ ██      ██  ██  
+██      ███████ ██   ██  ██████   ██████ ██   ██ ██   ██  ██████ ██   ██ 
+"""
+print(banner)
+
+def printSolve(original, decoded):
+    if original:
+        print("Original: " + original)
+    if decoded:
+        print("Decoded: " + decoded)
+    print("")
+
+def checkForFlag(line):
+    if flagType in line:
+        printSolve(line)
+    elif flagType[::-1] in line:
+        printSolve(line, line[::-1])
+    elif base64.b64encode(flagType.encode("ascii")).decode("ascii") in line:
+        printSolve(line, base64.b64decode(line.encode("ascii")).decode("ascii"))
+    elif base64.b64encode(flagType.encode("ascii")).decode("ascii")[::-1] in line:
+        printSolve(line, base64.b64decode(line[::-1].encode("ascii")).decode("ascii"))
+
+if filePath or flagType:
+    with open(filePath, "r") as f:
+        content = f.read()
+        for word in content.replace("\n", " ").split(" "):
+            checkForFlag(word)
+else:
+    print("Flagcrack is used to find flags in files")
+    print("Flagcrack will check if each line includes the flag")
+    print("Flagcrack tries multiple different encodings and reverse strings")
+    print("")
+    print("-p: path to file with the flag you want to grab")
+    print("-f: the prefix of the flag you want to grab e.g. picoCTF")
+    print("")
+    print("Example: flagcrack -p /file.txt -f picoCTF")
