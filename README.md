@@ -9,7 +9,10 @@ Flagcrack tries multiple different encodings and reverse strings </br>
 -p: path to file with the flag you want to grab </br>
 -f: the prefix of the flag you want to grab e.g. picoCTF </br>
 </br>
-Example: flagcrack -p /file.txt -f picoCTF </br>
+Example:
+```bash
+flagcrack -p /file.txt -f picoCTF
+``
 
 ### Install
 ```bash
