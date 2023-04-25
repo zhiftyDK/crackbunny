@@ -12,7 +12,7 @@ Flagcrack tries multiple different encodings and reverse strings </br>
 Example:
 ```bash
 flagcrack -p /file.txt -f picoCTF
-``
+```
 
 ### Install
 ```bash
