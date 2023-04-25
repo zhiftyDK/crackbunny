@@ -1,4 +1,4 @@
-# flagcrack
+# Flagcrack
 ### Install
 ```bash
 wget https://raw.githubusercontent.com/zhiftyDK/flagcrack/main/flagcrack
