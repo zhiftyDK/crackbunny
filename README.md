@@ -1,6 +1,12 @@
-# flagcrack
+███████ ██       █████   ██████   ██████ ██████   █████   ██████ ██   ██ 
+██      ██      ██   ██ ██       ██      ██   ██ ██   ██ ██      ██  ██  
+█████   ██      ███████ ██   ███ ██      ██████  ███████ ██      █████   
+██      ██      ██   ██ ██    ██ ██      ██   ██ ██   ██ ██      ██  ██  
+██      ███████ ██   ██  ██████   ██████ ██   ██ ██   ██  ██████ ██   ██ 
 
 ### Install
 ```bash
-mkdir haha
+wget https://raw.githubusercontent.com/zhiftyDK/flagcrack/main/flagcrack
+chmod +x flagcrack
+sudo mv flagcrack /bin
 ```
