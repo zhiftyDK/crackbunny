@@ -13,6 +13,18 @@ Example:
 ```bash
 flagcrack -p /file.txt -f picoCTF
 ```
+Output:
+```bash
+███████ ██       █████   ██████   ██████ ██████   █████   ██████ ██   ██ 
+██      ██      ██   ██ ██       ██      ██   ██ ██   ██ ██      ██  ██  
+█████   ██      ███████ ██   ███ ██      ██████  ███████ ██      █████   
+██      ██      ██   ██ ██    ██ ██      ██   ██ ██   ██ ██      ██  ██  
+██      ███████ ██   ██  ██████   ██████ ██   ██ ██   ██  ██████ ██   ██ 
+
+Original: =0Hbv9GVfR3clJ0XlhGVfNXSft2YhJ3YnFGbGtnRUN0bjlGc
+Decoded: picoCTF{Flagcrack_Is_The_Best_Tool}
+
+```
 
 ### Install
 ```bash
