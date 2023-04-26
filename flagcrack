@@ -28,7 +28,7 @@ def printSolve(original, decoded):
 
 def checkForFlag(line):
     if flagType in line:
-        printSolve(line)
+        printSolve(line, line)
     elif flagType[::-1] in line:
         printSolve(line, line[::-1])
     elif base64.b64encode(flagType.encode("ascii")).decode("ascii") in line:
