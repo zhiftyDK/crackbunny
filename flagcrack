@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import base64
+import re
 
 def getArg(argDefiner):
     for index, arg in enumerate(sys.argv):
@@ -49,9 +50,9 @@ def checkForFlag(line):
         pass
 
 if filePath or flagType:
-    with open(filePath, "r") as f:
+    with open(filePath, encoding="utf8", errors='ignore') as f:
         content = f.read()
-        for word in content.replace("\n", " ").split(" "):
+        for word in re.sub("[^0-9a-zA-Z+/=_}{]+", " ", content).split(" "):
             checkForFlag(word)
 elif "-h" in sys.argv or "--help" in sys.argv:
     print("Flagcrack is used to find flags in files")
