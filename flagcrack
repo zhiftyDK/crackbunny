@@ -31,9 +31,9 @@ def checkForFlag(line):
         printSolve(line, line)
     elif flagType[::-1] in line:
         printSolve(line, line[::-1])
-    elif base64.b64encode(flagType.encode("ascii")).decode("ascii") in line:
+    elif base64.b64encode(flagType.encode("ascii")).decode("ascii").replace("=", "") in line:
         printSolve(line, base64.b64decode(line.encode("ascii")).decode("ascii"))
-    elif base64.b64encode(flagType.encode("ascii")).decode("ascii")[::-1] in line:
+    elif base64.b64encode(flagType.encode("ascii")).decode("ascii").replace("=", "")[::-1] in line:
         printSolve(line, base64.b64decode(line[::-1].encode("ascii")).decode("ascii"))
 
 if filePath or flagType:
@@ -50,3 +50,5 @@ elif "-h" in sys.argv or "--help" in sys.argv:
     print("-f: the prefix of the flag you want to grab e.g. picoCTF")
     print("")
     print("Example: flagcrack -p /file.txt -f picoCTF")
+else:
+    print("For help type: flagcrack -h")
