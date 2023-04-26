@@ -27,14 +27,26 @@ def printSolve(original, decoded):
     print("")
 
 def checkForFlag(line):
-    if flagType in line:
-        printSolve(line, line)
-    elif flagType[::-1] in line:
-        printSolve(line, line[::-1])
-    elif base64.b64encode(flagType.encode("ascii")).decode("ascii").replace("=", "") in line:
-        printSolve(line, base64.b64decode(line.encode("ascii")).decode("ascii"))
-    elif base64.b64encode(flagType.encode("ascii")).decode("ascii").replace("=", "")[::-1] in line:
-        printSolve(line, base64.b64decode(line[::-1].encode("ascii")).decode("ascii"))
+    try:
+        if flagType in line:
+            printSolve(line, line)
+    except:
+        pass
+    try:
+        if flagType in line[::-1]:
+            printSolve(line, line[::-1])
+    except:
+        pass
+    try:
+        if flagType in base64.b64decode(line.encode("ascii")).decode("ascii"):
+            printSolve(line, base64.b64decode(line.encode("ascii")).decode("ascii"))
+    except:
+        pass
+    try:
+        if flagType in base64.b64decode(line[::-1].encode("ascii")).decode("ascii"):
+            printSolve(line, base64.b64decode(line[::-1].encode("ascii")).decode("ascii"))
+    except:
+        pass
 
 if filePath or flagType:
     with open(filePath, "r") as f:
