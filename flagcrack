@@ -2,6 +2,16 @@
 import sys
 import re
 import codecs
+import os
+
+try:
+    from PIL import Image
+except ImportError:
+    os.system("pip install PIL")
+try:
+    import numpy as np
+except ImportError:
+    os.system("pip install PIL")
 
 def getArg(argDefiner):
     for index, arg in enumerate(sys.argv):
@@ -59,11 +69,39 @@ def checkForFlag(line):
     except:
         pass
 
+def LSBdecode(src):
+    img = Image.open(src, 'r')
+    array = np.array(list(img.getdata()))
+
+    if img.mode == 'RGB':
+        n = 3
+    elif img.mode == 'RGBA':
+        n = 4
+
+    total_pixels = array.size//n
+
+    hidden_bits = ""
+    for p in range(total_pixels):
+        for q in range(0, 3):
+            hidden_bits += (bin(array[p][q])[2:][-1])
+
+    hidden_bits = [hidden_bits[i:i+8] for i in range(0, len(hidden_bits), 8)]
+
+    message = ""
+    for i in range(len(hidden_bits)):
+        if message[-5:] == "$t3g0":
+            break
+        else:
+            message += chr(int(hidden_bits[i], 2))
+    if "$t3g0" in message:
+        checkForFlag(message[:-5])
+
 if filePath or flagType:
     with open(filePath, encoding="utf8", errors='ignore') as f:
         content = f.read()
         for word in re.sub("[^0-9a-zA-Z+/=_}{@]+", " ", content).replace("}", "} ").split(" "):
             checkForFlag(word)
+        LSBdecode(filePath)
 elif "-h" in sys.argv or "--help" in sys.argv:
     print("Flagcrack is used to find flags in files")
     print("Flagcrack will check if each line includes the flag")
