@@ -33,5 +33,13 @@ chmod +x flagcrack
 sudo mv flagcrack /bin
 ```
 
+## Update
+```bash
+sudo rm /bin/flagcrack
+wget https://raw.githubusercontent.com/zhiftyDK/flagcrack/main/flagcrack
+chmod +x flagcrack
+sudo mv flagcrack /bin
+```
+
 ## Todo
 * Add rot encoding
