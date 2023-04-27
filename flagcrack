@@ -62,7 +62,7 @@ def checkForFlag(line):
 if filePath or flagType:
     with open(filePath, encoding="utf8", errors='ignore') as f:
         content = f.read()
-        for word in re.sub("[^0-9a-zA-Z+/=_}{]+", " ", content).split(" "):
+        for word in re.sub("[^0-9a-zA-Z+/=_}{@]+", " ", content).split(" "):
             checkForFlag(word)
 elif "-h" in sys.argv or "--help" in sys.argv:
     print("Flagcrack is used to find flags in files")
