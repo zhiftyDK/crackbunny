@@ -11,7 +11,7 @@ except ImportError:
 try:
     import numpy as np
 except ImportError:
-    os.system("pip install PIL")
+    os.system("pip install numpy")
 
 def getArg(argDefiner):
     for index, arg in enumerate(sys.argv):
