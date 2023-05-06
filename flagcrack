@@ -2,16 +2,24 @@
 import sys
 import re
 import codecs
-import os
+from subprocess import DEVNULL, STDOUT, run
 
-try:
-    from PIL import Image
-except ImportError:
-    os.system("pip install PIL")
-try:
-    import numpy as np
-except ImportError:
-    os.system("pip install numpy")
+while True:
+    try:
+        from PIL import Image
+    except ImportError:
+        print("Missing package: Pillow")
+        print("Insalling package: Pillow")
+        run(["pip", "install", "Pillow"], capture_output=False)
+        continue
+    try:
+        import numpy as np
+    except ImportError:
+        print("Missing package: numpy")
+        print("Insalling package: numpy")
+        run(["pip", "install", "numpy"], capture_output=False)
+        continue
+    break
 
 def getArg(argDefiner):
     for index, arg in enumerate(sys.argv):
