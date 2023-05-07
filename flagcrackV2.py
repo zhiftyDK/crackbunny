@@ -92,12 +92,22 @@ def strings(path):
             except: pass
         print("[!] Didnt find any matching strings in plaintext!")
 
-    def base64(content):
+    def base64(content, searchString):
         for string in re.sub("[^0-9a-zA-Z+/=]+", " ", content).split(" "):
-            try: print("[+] Found base64 encoded string: " + codecs.decode(string.encode("ascii"), "base64").decode("ascii"))
-            except: pass
-            try: print("[+] Found reversed base64 encoded string: " + codecs.decode(string[::-1].encode("ascii"), "base64").decode("ascii"))
-            except: pass
+            if searchString:
+                try: 
+                    if searchString in codecs.decode(string.encode("ascii"), "base64").decode("ascii"):
+                        print("[+] Found base64 encoded string: " + codecs.decode(string.encode("ascii"), "base64").decode("ascii"))
+                except: pass
+                try: 
+                    if searchString in codecs.decode(string[::-1].encode("ascii"), "base64").decode("ascii"):
+                        print("[+] Found reversed base64 encoded string: " + codecs.decode(string[::-1].encode("ascii"), "base64").decode("ascii"))
+                except: pass
+            else:
+                try: print("[+] Found base64 encoded string: " + codecs.decode(string.encode("ascii"), "base64").decode("ascii"))
+                except: pass
+                try: print("[+] Found reversed base64 encoded string: " + codecs.decode(string[::-1].encode("ascii"), "base64").decode("ascii"))
+                except: pass
         print("[!] Didnt find any base64 encoded strings!")
 
     searchString = getArg("-s") or False
@@ -109,7 +119,7 @@ def strings(path):
             base64(content, searchString)
         else:
             print("[+] Looking for encoded strings in the data of: " + path)
-            base64(content)
+            base64(content, False)
 
 
 # File handler, detects specific type of file and starts actions
