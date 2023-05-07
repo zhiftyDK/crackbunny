@@ -16,11 +16,12 @@ codecs.ascii_decode
 
 # Print the Flagcrack banner
 banner = """
-███████ ██       █████   ██████   ██████ ██████   █████   ██████ ██   ██ 
-██      ██      ██   ██ ██       ██      ██   ██ ██   ██ ██      ██  ██  
-█████   ██      ███████ ██   ███ ██      ██████  ███████ ██      █████   
-██      ██      ██   ██ ██    ██ ██      ██   ██ ██   ██ ██      ██  ██  
-██      ███████ ██   ██  ██████   ██████ ██   ██ ██   ██  ██████ ██   ██ 
+         ((`\\
+      ___ \\\\ '--._
+   .'`   `'    o  )     CRACKBUNNY
+  /    \   '. __.'   made by zhiftyDK
+ _|    /_  \ \_\_       Copyright ©
+{_\______\-'\__\_\\
 """
 print(banner)
 
@@ -100,7 +101,7 @@ def strings(path):
 
     def base64(content, searchString):
         foundMatch = False
-        for string in re.sub("[^0-9a-zA-Z+/=]+", " ", content).split(" "):
+        for string in re.sub("[^0-9a-zA-Z+=]+", " ", content).split(" "):
             try: 
                 if searchString in codecs.decode(string.encode("ascii"), "base64").decode("ascii"):
                     print("[+] Found base64 encoded string: " + codecs.decode(string.encode("ascii"), "base64").decode("ascii"))
@@ -114,6 +115,24 @@ def strings(path):
         if not foundMatch:
             print("[!] Didnt find any base64 encoded strings!")
 
+    def rot13(content, searchString):
+        foundMatch = False
+        for string in content.split(" "):
+            try:
+                if searchString in codecs.decode(string, "rot13"):
+                    print("[+] Found rot13 encoded string: " + codecs.decode(string, "rot13"))
+                    foundMatch = True
+            except:
+                pass
+            try:
+                if searchString in codecs.decode(string[::-1], "rot13"):
+                    print("[+] Found reversed rot13 encoded string: " + codecs.decode(string[::-1], "rot13"))
+                    foundMatch = True
+            except:
+                pass
+        if not foundMatch:
+            print("[!] Didnt find any rot13 encoded strings!")
+
     searchString = getArg("-s") or False
     with open(path, encoding="utf8", errors='ignore') as f:
         content = f.read()
@@ -121,6 +140,7 @@ def strings(path):
             print(f"[+] Looking for strings matching '{searchString}', in the data of {path}")
             plainText(content, searchString)
             base64(content, searchString)
+            rot13(content, searchString)
         else:
             print("[!] Couldnt run strings method on file since no searchstring was defined!")
 
@@ -156,4 +176,4 @@ elif "-h" in sys.argv or "--help" in sys.argv:
     print("")
     print("Example: flagcrack -p /file.txt -f picoCTF")
 else:
-    print("[!] For help type: flagcrack -h")
+    print("[!] For help type: crackbunny -h")
