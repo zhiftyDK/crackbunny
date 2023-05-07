@@ -135,7 +135,7 @@ def strings(path):
 
     searchString = getArg("-s") or False
     with open(path, encoding="utf8", errors='ignore') as f:
-        content = f.read()
+        content = f.read().replace("\n", "")
         if searchString:
             print(f"[+] Looking for strings matching '{searchString}', in the data of {path}")
             plainText(content, searchString)
