@@ -57,7 +57,7 @@ def unzip(path):
 
 # LSB decoding for images and files, 
 def LSBdecode(path):
-    print(f"LSB decoding: {path}")
+    print(f"[+] LSB decoding: {path}")
     img = Image.open(path, 'r')
     array = np.array(list(img.getdata()))
 
@@ -78,7 +78,39 @@ def LSBdecode(path):
     message = ""
     for i in range(len(hidden_bits)):
         message += chr(int(hidden_bits[i], 2))
-    return message
+    print("[+] Found hidden message with LSB decoding: " + message)
+
+# Strings looks for specific strings in files, both encoded and reversed
+def strings(path):
+    def plainText(content, searchString):
+        for string in content.split(" "):
+            try: 
+                if searchString in string: print("[+] Found plaintext string match: " + string)
+            except: pass
+            try:
+                if searchString in string[::-1]: print("[+] Found reversed plaintext string match: " + string[::-1])
+            except: pass
+        print("[!] Didnt find any matching strings in plaintext!")
+
+    def base64(content):
+        for string in re.sub("[^0-9a-zA-Z+/=]+", " ", content).split(" "):
+            try: print("[+] Found base64 encoded string: " + codecs.decode(string.encode("ascii"), "base64").decode("ascii"))
+            except: pass
+            try: print("[+] Found reversed base64 encoded string: " + codecs.decode(string[::-1].encode("ascii"), "base64").decode("ascii"))
+            except: pass
+        print("[!] Didnt find any base64 encoded strings!")
+
+    searchString = getArg("-s") or False
+    with open(path, encoding="utf8", errors='ignore') as f:
+        content = f.read()
+        if searchString:
+            print(f"[+] Looking for strings in the data of {path}, that matches your searchString: {searchString}")
+            plainText(content, searchString)
+            base64(content, searchString)
+        else:
+            print("[+] Looking for encoded strings in the data of: " + path)
+            base64(content)
+
 
 # File handler, detects specific type of file and starts actions
 def fileHandler(path):
@@ -89,18 +121,18 @@ def fileHandler(path):
         elif os.path.isfile(path):
             if fileExtension == "png" or fileExtension == "bmp":
                 LSBdecode(path)
+                strings(path)
             elif fileExtension == "zip":
-                print("Currently unable to handle zip files, if its password protected use John The Ripper!")
+                print("[!] Currently unable to handle zip files, if its password protected use John The Ripper!")
+            else:
+                strings(path)
     else:
         print("[!] The specified filepath is not valid!")
 
 # Initialise flagcrack
-filePath = getArg("-p") or False
-flagType = getArg("-f") or False
+filePath = getArg("-f") or False
 if filePath:
     fileHandler(filePath)
-elif flagType:
-    print(flagType)
 elif "-h" in sys.argv or "--help" in sys.argv:
     print("Flagcrack is used to find flags in files")
     print("Flagcrack will check if each line includes the flag")
@@ -111,4 +143,4 @@ elif "-h" in sys.argv or "--help" in sys.argv:
     print("")
     print("Example: flagcrack -p /file.txt -f picoCTF")
 else:
-    print("For help type: flagcrack -h")
+    print("[!] For help type: flagcrack -h")
