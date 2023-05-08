@@ -4,6 +4,7 @@ import sys
 import re
 import codecs
 import zipfile
+import hashlib
 
 # Importing/Installing missing python modules
 try: from PIL import Image
@@ -133,14 +134,35 @@ def strings(path):
         if not foundMatch:
             print("[-] Didnt find any rot13 encoded strings")
 
+    def md5(content, searchString=False):
+        foundMatch = False
+        for string in re.sub("[^a-fA-F0-9{32}$]+", " ", content).split(" "):
+            if re.compile("^[a-fA-F0-9]{32}$").match(string):
+                print(f"[+] Found possible MD5 hashed string: {string}")
+                print(f"    To validate type: 'crackbunny -e {string}'")
+                foundMatch = True
+        if not foundMatch:
+            print("[-] Didnt find any MD5 hashed strings")
+
+    def sha256(content, searchString=False):
+        foundMatch = False
+        for string in re.sub("[^a-fA-F0-9{64}$]+", " ", content).split(" "):
+            if re.compile("^[a-fA-F0-9]{64}$").match(string):
+                print(f"[+] Found possible SHA256 hashed string: {string}")
+                print(f"    To validate type: 'crackbunny -e {string}'")
+                foundMatch = True
+        if not foundMatch:
+            print("[-] Didnt find any SHA256 hashed strings")
+
     searchString = getArg("-s") or False
     with open(path, encoding="utf8", errors='ignore') as f:
         content = f.read().replace("\n", "")
         if searchString:
-            print(f"[+] Looking for strings matching '{searchString}', in the data of '{path}'")
             plainText(content, searchString)
             base64(content, searchString)
             rot13(content, searchString)
+            md5(content)
+            sha256(content)
         else:
             print(f"[-] Couldnt run strings method on '{path}' since no searchstring was defined")
 
@@ -166,17 +188,71 @@ def fileHandler(path):
     else:
         print(f"[-] The path '{path}' is not valid")
 
+# Hashcrack tries to crack md5 and sha256
+def hashCrack(string):
+    if re.compile("^[a-f0-9]{32}$").match(string):
+        print(f"[+] Trying to crack hash type MD5: {string}")
+        with open("password.txt", "r") as f:
+            guessed = False
+            for word in f.read().splitlines():
+                guess = hashlib.md5(word.encode("utf-8")).hexdigest()
+                if guess.upper() == string or guess.lower() == string:
+                    print(f'[+] Hash plaintext: {word}')
+                    guessed = True
+                    break
+            if not guessed:
+                print(f"[-] Couldnt crack hash with wordlist 'password.txt'")
+    elif re.compile("^[a-fA-F0-9]{64}$").match(string):
+        print(f"[+] Trying to crack hash type SHA256: {string}")
+        with open("password.txt", "r") as f:
+            guessed = False
+            for word in f.read().splitlines():
+                guess = hashlib.sha256(word.encode("utf-8")).hexdigest()
+                if guess.upper() == string or guess.lower() == string:
+                    print(f'[+] Hash plaintext: {word}')
+                    guessed = True
+                    break
+            if not guessed:
+                print(f"[-] Couldnt crack hash with wordlist 'password.txt'")
+    else:
+        print(f"[-] Provided string {string}, is not a hash")
+
+# Stringdecode tries to decode base64 and rot13
+def stringDecode(string):
+    foundMatch = False
+    try:
+        print("[+] Base64 decoded: " + codecs.decode(string.encode("ascii"), "base64").decode("ascii"))
+        foundMatch = True
+    except:
+        pass
+    if not foundMatch:
+        print(f"[-] Provided string {string}, is not encoded with base64")
+
+    foundMatch = False
+    try:
+        print("[+] Rot13 decoded: " + codecs.decode(string, "rot13"))
+        foundMatch = True
+    except:
+        pass
+    if not foundMatch:
+        print(f"[-] Provided string {string}, is not encoded with rot13")
+
 # Initialise flagcrack
 path = getArg("-p") or False
+string = getArg("-e") or False
 if path:
     fileHandler(path)
+elif string:
+    hashCrack(string)
+    stringDecode(string)
 elif "-h" in sys.argv or "--help" in sys.argv:
     print("Crackbunny is used to find strings or hidden information in files and directories")
     print("Crackbunny's capabilities: LSB decoding, Unzipping/binwalking & finding encoded string matches")
     print("")
     print("-p: <file/directory path> Path of the file or directory you want to crack")
     print("-s: <string> String that you want to look for in files")
-    print("-c: <string> String that you want to crack")
-    print("Example: crackbunny -f /file.txt -s picoCTF")
+    print("-e: <string> Encoded/hashed string that you want to decode/crack")
+    print("")
+    print("Example: 'crackbunny -p /myDir -s picoCTF'")
 else:
-    print("For help type: crackbunny -h")
+    print("For help type: 'crackbunny -h'")
