@@ -247,7 +247,8 @@ elif string:
     stringDecode(string)
 elif "-h" in sys.argv or "--help" in sys.argv:
     print("Crackbunny is used to find strings or hidden information in files and directories")
-    print("Crackbunny's capabilities: LSB decoding, Unzipping/binwalking & finding encoded string matches")
+    print("Crackbunny is capable of: LSB decoding, Unzipping/binwalking & finding encoded string matches")
+    print("Crackbunny is capable of: Cracking SHA256 and MD5 & decoding base64 and rot13")
     print("")
     print("-p: <file/directory path> Path of the file or directory you want to crack")
     print("-s: <string> String that you want to look for in files")
