@@ -39,41 +39,47 @@ def unzip(path):
         archive.extractall()
         fileNameList = ""
         for file in archive.filelist:
-            fileNameList += file.filename + ", "
+            if os.path.isfile(file.filename):
+                fileNameList += file.filename + ", "
         print(f"[+] Files found in '{path}': {fileNameList[:-2]}")
         print(f"[+] Extracted files from '{path}'")
+        for file in archive.filelist:
+            if os.path.isdir(file.filename):
+                    fileHandler(file.filename)
     except (zipfile.BadZipFile, RuntimeError) as e:
         if "encrypted" in str(e):
-            print(f"[!] Currently unable to handle password protected zip files, use John The Ripper on {path}!")
+            print(f"[-] Currently unable to handle password protected zip files, use John The Ripper on {path}")
         else:
-            print(f"[!] No embedded files found in '{path}'")
+            print(f"[-] No embedded files found in '{path}'")
 
 # LSB decoding for images and files, 
 def LSBdecode(path):
     fileExtension = path.split(".")[len(path.split(".")) - 1].lower()
     if fileExtension == "png" or fileExtension == "bmp":
-        print(f"[+] LSB decoding: '{path}'")
-        img = Image.open(path, 'r')
-        array = np.array(list(img.getdata()))
+        try:
+            img = Image.open(path, 'r')
+            array = np.array(list(img.getdata()))
+            
+            if img.mode == 'RGB':
+                n = 3
+            elif img.mode == 'RGBA':
+                n = 4
 
-        if img.mode == 'RGB':
-            n = 3
-        elif img.mode == 'RGBA':
-            n = 4
+            total_pixels = array.size//n
 
-        total_pixels = array.size//n
+            hidden_bits = ""
+            for p in range(total_pixels):
+                for q in range(0, 3):
+                    hidden_bits += (bin(array[p][q])[2:][-1])
 
-        hidden_bits = ""
-        for p in range(total_pixels):
-            for q in range(0, 3):
-                hidden_bits += (bin(array[p][q])[2:][-1])
+            hidden_bits = [hidden_bits[i:i+8] for i in range(0, len(hidden_bits), 8)]
 
-        hidden_bits = [hidden_bits[i:i+8] for i in range(0, len(hidden_bits), 8)]
-
-        message = ""
-        for i in range(len(hidden_bits)):
-            message += chr(int(hidden_bits[i], 2))
-        print("[+] Found hidden message with LSB decoding: " + message)
+            message = ""
+            for i in range(len(hidden_bits)):
+                message += chr(int(hidden_bits[i], 2))
+            print(f"[+] Found hidden message with LSB decoding: " + message)
+        except:
+            print(f"[-] LSB decoding of '{path}' failed")
 
 # Strings looks for specific strings in files, both encoded and reversed
 def strings(path):
@@ -91,7 +97,7 @@ def strings(path):
                     foundMatch = True
             except: pass
         if not foundMatch:
-            print("[!] Didnt find any matching strings in plaintext!")
+            print("[-] Didnt find any matching strings in plaintext")
 
     def base64(content, searchString):
         foundMatch = False
@@ -107,7 +113,7 @@ def strings(path):
                     foundMatch = True
             except: pass
         if not foundMatch:
-            print("[!] Didnt find any base64 encoded strings!")
+            print("[-] Didnt find any base64 encoded strings")
 
     def rot13(content, searchString):
         foundMatch = False
@@ -125,7 +131,7 @@ def strings(path):
             except:
                 pass
         if not foundMatch:
-            print("[!] Didnt find any rot13 encoded strings!")
+            print("[-] Didnt find any rot13 encoded strings")
 
     searchString = getArg("-s") or False
     with open(path, encoding="utf8", errors='ignore') as f:
@@ -136,7 +142,7 @@ def strings(path):
             base64(content, searchString)
             rot13(content, searchString)
         else:
-            print(f"[!] Couldnt run strings method on '{path}' since no searchstring was defined!")
+            print(f"[-] Couldnt run strings method on '{path}' since no searchstring was defined")
 
 # Directory search for all files in a directory and passes them to the filehandler
 def directory(path):
@@ -158,12 +164,12 @@ def fileHandler(path):
             strings(path)
             unzip(path)
     else:
-        print(f"[!] The filepath: {path} is not valid!")
+        print(f"[-] The path '{path}' is not valid")
 
 # Initialise flagcrack
-filePath = getArg("-f") or False
-if filePath:
-    fileHandler(filePath)
+path = getArg("-p") or False
+if path:
+    fileHandler(path)
 elif "-h" in sys.argv or "--help" in sys.argv:
     print("Crackbunny is used to find strings or hidden information in files and directories")
     print("Crackbunny's capabilities: LSB decoding, Unzipping/binwalking & finding encoded string matches")
@@ -173,4 +179,4 @@ elif "-h" in sys.argv or "--help" in sys.argv:
     print("-c: <string> String that you want to crack")
     print("Example: crackbunny -f /file.txt -s picoCTF")
 else:
-    print("[!] For help type: crackbunny -h")
+    print("For help type: crackbunny -h")
