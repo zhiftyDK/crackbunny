@@ -3,18 +3,19 @@ import os
 import sys
 import re
 import codecs
+import zipfile
+
+# Importing/Installing missing python modules
 try: from PIL import Image
-except ImportError: os.system("pip install Pillow")
+except ImportError: 
+    os.system("pip install Pillow")
+    from PIL import Image
 try: import numpy as np
-except ImportError: os.system("pip install numpy")
-try: from tqdm import tqdm
-except ImportError: os.system("pip install tqdm")
-try: import zipfile_deflate64 as zipfile
-except ImportError: os.system("pip install zipfile-deflate64")
+except ImportError: 
+    os.system("pip install numpy")
+    import numpy as np
 
-codecs.ascii_decode
-
-# Print the Flagcrack banner
+# Print the Crackbunny banner
 banner = """
          ((`\\
       ___ \\\\ '--._
@@ -33,53 +34,46 @@ def getArg(argDefiner):
 
 # unzip is used to unzip or crack password encrypted zip files (NOT WORKING!)
 def unzip(path):
-    zipArchive = zipfile.ZipFile(path, mode="r", compression=zipfile.ZIP_DEFLATED64)
     try:
-        print("[+] Unzipping zip archive!")
-        for fileNames in list(zipArchive.filelist):
-            with zipArchive.open(fileNames[0], mode="r", pwd=str.encode("password")) as memberArchive:
-                print(memberArchive.read().decode("utf-8"))
-        os.remove(path)
-    except:
-        print("[!] Zip archive is password protected, cracking the password!")
-        # wordlist = "rockyou.txt"
-        # n_words = len(list(open(wordlist, "rb")))
-        # with open(wordlist, "rb") as wordlist:
-        #     for word in tqdm(wordlist, total=n_words, unit="word"):
-        #         try:
-        #             with pyzipper.AESZipFile(path, 'r', compression=pyzipper.ZIP_DEFLATED, encryption=pyzipper.WZ_AES) as extracted_zip:
-        #                 extracted_zip.extractall(pwd=str.encode("password"))
-        #         except:
-        #             continue
-        #         else:
-        #             print("[+] Password found: ", word.decode().strip())
-        #             os.remove(path)
-        print(f"[!] Password to: {path} not found.")
+        archive = zipfile.ZipFile(path)
+        archive.extractall()
+        fileNameList = ""
+        for file in archive.filelist:
+            fileNameList += file.filename + ", "
+        print(f"[+] Files found in '{path}': {fileNameList[:-2]}")
+        print(f"[+] Extracted files from '{path}'")
+    except (zipfile.BadZipFile, RuntimeError) as e:
+        if "encrypted" in str(e):
+            print(f"[!] Currently unable to handle password protected zip files, use John The Ripper on {path}!")
+        else:
+            print(f"[!] No embedded files found in '{path}'")
 
 # LSB decoding for images and files, 
 def LSBdecode(path):
-    print(f"[+] LSB decoding: {path}")
-    img = Image.open(path, 'r')
-    array = np.array(list(img.getdata()))
+    fileExtension = path.split(".")[len(path.split(".")) - 1].lower()
+    if fileExtension == "png" or fileExtension == "bmp":
+        print(f"[+] LSB decoding: '{path}'")
+        img = Image.open(path, 'r')
+        array = np.array(list(img.getdata()))
 
-    if img.mode == 'RGB':
-        n = 3
-    elif img.mode == 'RGBA':
-        n = 4
+        if img.mode == 'RGB':
+            n = 3
+        elif img.mode == 'RGBA':
+            n = 4
 
-    total_pixels = array.size//n
+        total_pixels = array.size//n
 
-    hidden_bits = ""
-    for p in range(total_pixels):
-        for q in range(0, 3):
-            hidden_bits += (bin(array[p][q])[2:][-1])
+        hidden_bits = ""
+        for p in range(total_pixels):
+            for q in range(0, 3):
+                hidden_bits += (bin(array[p][q])[2:][-1])
 
-    hidden_bits = [hidden_bits[i:i+8] for i in range(0, len(hidden_bits), 8)]
+        hidden_bits = [hidden_bits[i:i+8] for i in range(0, len(hidden_bits), 8)]
 
-    message = ""
-    for i in range(len(hidden_bits)):
-        message += chr(int(hidden_bits[i], 2))
-    print("[+] Found hidden message with LSB decoding: " + message)
+        message = ""
+        for i in range(len(hidden_bits)):
+            message += chr(int(hidden_bits[i], 2))
+        print("[+] Found hidden message with LSB decoding: " + message)
 
 # Strings looks for specific strings in files, both encoded and reversed
 def strings(path):
@@ -137,43 +131,46 @@ def strings(path):
     with open(path, encoding="utf8", errors='ignore') as f:
         content = f.read().replace("\n", "")
         if searchString:
-            print(f"[+] Looking for strings matching '{searchString}', in the data of {path}")
+            print(f"[+] Looking for strings matching '{searchString}', in the data of '{path}'")
             plainText(content, searchString)
             base64(content, searchString)
             rot13(content, searchString)
         else:
-            print("[!] Couldnt run strings method on file since no searchstring was defined!")
+            print(f"[!] Couldnt run strings method on '{path}' since no searchstring was defined!")
 
+# Directory search for all files in a directory and passes them to the filehandler
+def directory(path):
+    dirContent = [f for f in os.listdir(path)]
+    for member in dirContent:
+        memberPath = os.path.join(path, member)
+        if os.path.isfile(memberPath):
+            fileHandler(memberPath)
+        elif os.path.isdir(memberPath):
+            directory(memberPath)
 
 # File handler, detects specific type of file and starts actions
 def fileHandler(path):
     if os.path.exists(path):
-        fileExtension = path.split(".")[len(path.split(".")) - 1].lower()
         if os.path.isdir(path):
-            print("[+] Path is directory")
+            directory(path)
         elif os.path.isfile(path):
-            if fileExtension == "png" or fileExtension == "bmp":
-                LSBdecode(path)
-                strings(path)
-            elif fileExtension == "zip":
-                print("[!] Currently unable to handle zip files, if its password protected use John The Ripper!")
-            else:
-                strings(path)
+            LSBdecode(path)
+            strings(path)
+            unzip(path)
     else:
-        print("[!] The specified filepath is not valid!")
+        print(f"[!] The filepath: {path} is not valid!")
 
 # Initialise flagcrack
 filePath = getArg("-f") or False
 if filePath:
     fileHandler(filePath)
 elif "-h" in sys.argv or "--help" in sys.argv:
-    print("Flagcrack is used to find flags in files")
-    print("Flagcrack will check if each line includes the flag")
-    print("Flagcrack tries multiple different encodings and reverse strings")
+    print("Crackbunny is used to find strings or hidden information in files and directories")
+    print("Crackbunny's capabilities: LSB decoding, Unzipping/binwalking & finding encoded string matches")
     print("")
-    print("-p: path to file with the flag you want to grab")
-    print("-f: the prefix of the flag you want to grab e.g. picoCTF")
+    print("-f: filepath of the file or directory you want to crack")
+    print("-s: the searchString that you want to look for in files")
     print("")
-    print("Example: flagcrack -p /file.txt -f picoCTF")
+    print("Example: crackbunny -f /file.txt -s picoCTF")
 else:
     print("[!] For help type: crackbunny -h")
