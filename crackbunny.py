@@ -168,9 +168,9 @@ elif "-h" in sys.argv or "--help" in sys.argv:
     print("Crackbunny is used to find strings or hidden information in files and directories")
     print("Crackbunny's capabilities: LSB decoding, Unzipping/binwalking & finding encoded string matches")
     print("")
-    print("-f: filepath of the file or directory you want to crack")
-    print("-s: the searchString that you want to look for in files")
-    print("")
+    print("-p: <file/directory path> Path of the file or directory you want to crack")
+    print("-s: <string> String that you want to look for in files")
+    print("-c: <string> String that you want to crack")
     print("Example: crackbunny -f /file.txt -s picoCTF")
 else:
     print("[!] For help type: crackbunny -h")
