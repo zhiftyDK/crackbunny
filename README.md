@@ -15,14 +15,19 @@ flagcrack -p /file.txt -f picoCTF
 ```
 Output:
 ```bash
-███████ ██       █████   ██████   ██████ ██████   █████   ██████ ██   ██ 
-██      ██      ██   ██ ██       ██      ██   ██ ██   ██ ██      ██  ██  
-█████   ██      ███████ ██   ███ ██      ██████  ███████ ██      █████   
-██      ██      ██   ██ ██    ██ ██      ██   ██ ██   ██ ██      ██  ██  
-██      ███████ ██   ██  ██████   ██████ ██   ██ ██   ██  ██████ ██   ██ 
+         ((`\
+      ___ \\ '--._
+   .'`   `'    o  )     CRACKBUNNY
+  /    \   '. __.'   made by zhiftyDK
+ _|    /_  \ \_\_       Copyright ©
+{_\______\-'\__\_\
 
-Original: =0Hbv9GVfR3clJ0XlhGVfNXSft2YhJ3YnFGbGtnRUN0bjlGc
-Decoded: picoCTF{Flagcrack_Is_The_Best_Tool}
+[-] Didnt find any matching strings in plaintext
+[+] Found reversed base64 encoded string: picoCTF{Flagcrack_Is_The_Best_Tool}
+[-] Didnt find any rot13 encoded strings
+[-] Didnt find any MD5 hashed strings
+[-] Didnt find any SHA256 hashed strings
+[-] No embedded files found in 'file.txt'
 
 ```
 
